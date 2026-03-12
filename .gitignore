@@ -1,0 +1,13 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Node
+node_modules/
+
+# Jenkins
+*.log
+
+# Mac/Linux
+.DS_Store

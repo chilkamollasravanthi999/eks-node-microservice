@@ -1,0 +1,51 @@
+pipeline {
+
+ agent any
+
+ environment {
+   AWS_REGION = 'us-east-1'
+   ECR_REPO = '123456789012.dkr.ecr.us-east-1.amazonaws.com/node-microservice'
+ }
+
+ stages {
+
+  stage('Clone Repo') {
+    steps {
+      git 'https://github.com/yourrepo/nodeapp.git'
+    }
+  }
+
+  stage('Build Image') {
+    steps {
+      sh 'docker build -t nodeapp .'
+    }
+  }
+
+  stage('Login to ECR') {
+    steps {
+      sh '''
+      aws ecr get-login-password --region $AWS_REGION \
+      | docker login --username AWS \
+      --password-stdin $ECR_REPO
+      '''
+    }
+  }
+
+  stage('Push Image') {
+    steps {
+      sh '''
+      docker tag nodeapp:latest $ECR_REPO:latest
+      docker push $ECR_REPO:latest
+      '''
+    }
+  }
+
+  stage('Deploy to EKS') {
+    steps {
+      sh 'helm upgrade --install nodeapp helm/nodeapp'
+    }
+  }
+
+ }
+
+}
