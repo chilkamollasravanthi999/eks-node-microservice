@@ -1,19 +1,18 @@
 output "cluster_name" {
-  value = module.eks.cluster_name
+  value = aws_eks_cluster.dev_eks.name
 }
 
 output "cluster_endpoint" {
-  value = module.eks.cluster_endpoint
-}
-
-output "ecr_repository_url" {
-  value = aws_ecr_repository.nodeapp.repository_url
+  value = aws_eks_cluster.dev_eks.endpoint
 }
 
 output "vpc_id" {
-  value = module.vpc.vpc_id
+  value = aws_vpc.dev_vpc.id
 }
 
 output "private_subnets" {
-  value = module.vpc.private_subnets
+  value = [
+    aws_subnet.private_subnet1.id,
+    aws_subnet.private_subnet2.id
+  ]
 }

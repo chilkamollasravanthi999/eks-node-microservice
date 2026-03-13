@@ -1,9 +1,17 @@
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
+resource "aws_eks_cluster" "dev_eks" {
+  name     = "dev-eks"
+  role_arn = aws_iam_role.eks_cluster_role.arn
 
-  cluster_name    = "dev-eks"
-  cluster_version = "1.29"
+  version = "1.29"
 
-  subnet_ids = module.vpc.private_subnets
-  vpc_id     = module.vpc.vpc_id
+  vpc_config {
+    subnet_ids = [
+      aws_subnet.private_subnet1.id,
+      aws_subnet.private_subnet2.id
+    ]
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_AmazonEKSClusterPolicy
+  ]
 }
