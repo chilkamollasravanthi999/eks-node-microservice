@@ -11,7 +11,7 @@ pipeline {
 
   stage('Clone Repo') {
     steps {
-      git 'https://github.com/yourrepo/nodeapp.git'
+      git 'https://github.com/chilkamollasravanthi999/eks-node-microservice.git'
     }
   }
 
