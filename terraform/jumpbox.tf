@@ -18,7 +18,7 @@ resource "aws_security_group" "jumpbox_sg" {
 
 resource "aws_instance" "jumpbox" {
 
-  ami           = "ami-0c02fb55956c7d316"
+  ami           = "ami-03f4878755434977f"
   instance_type = "t2.micro"
 
   subnet_id = aws_subnet.public_subnet1.id

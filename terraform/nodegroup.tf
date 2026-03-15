@@ -1,7 +1,7 @@
 resource "aws_eks_node_group" "dev_nodes" {
 
-  cluster_name    = aws_eks_cluster.dev_eks.name
-  node_group_name = "dev-nodes"
+  cluster_name    = aws_eks_cluster.eks_new.name
+  node_group_name = "eks_new-nodes"
   node_role_arn   = aws_iam_role.eks_node_role.arn
 
   subnet_ids = [

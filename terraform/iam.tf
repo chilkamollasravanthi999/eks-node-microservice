@@ -48,6 +48,8 @@ resource "aws_iam_role_policy_attachment" "registry_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
+
+
 resource "aws_iam_role" "jumpbox_role" {
   name = "jumpbox-ssm-role"
 
@@ -63,9 +65,14 @@ resource "aws_iam_role" "jumpbox_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_policy" {
+resource "aws_iam_role_policy_attachment" "jumpbox_ssm" {
   role       = aws_iam_role.jumpbox_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "jumpbox_eks" {
+  role       = aws_iam_role.jumpbox_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
 resource "aws_iam_instance_profile" "jumpbox_profile" {

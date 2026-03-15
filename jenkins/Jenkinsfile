@@ -3,8 +3,8 @@ pipeline {
  agent any
 
  environment {
-   AWS_REGION = 'us-east-1'
-   ECR_REPO = '123456789012.dkr.ecr.us-east-1.amazonaws.com/node-microservice'
+   AWS_REGION = 'ap-south-1'
+   ECR_REPO = '891970965031.dkr.ecr.ap-south-1.amazonaws.com/node-microservice'
  }
 
  stages {
