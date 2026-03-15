@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 
 app.get('/', (req,res)=>{
-    res.send("Node Microservice running in EKS ThankYou")
+    res.send("Node Microservice running in EKS")
 })
 
 app.listen(3000,()=>{
