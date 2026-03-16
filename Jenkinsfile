@@ -14,19 +14,30 @@ pipeline {
             }
         }
 
-        // ✅ NPM build stage running on nodejs-agent
+        // ✅ NPM build inside Node.js container
         stage('NPM build') {
-            agent { label 'nodejs-agent' }
             steps {
-                echo 'NPM build is in progress'
-                sh 'npm install'
-                sh 'npm run build || echo "No build script found"'
+                script {
+                    docker.image('node:20-alpine').inside('-v $WORKSPACE:/workspace') {
+                        dir('/workspace') {
+                            echo 'NPM build is in progress'
+                            sh 'npm install'
+                            sh 'npm run build || echo "No build script found"'
+                        }
+                    }
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test || echo "No tests found"'
+                script {
+                    docker.image('node:20-alpine').inside('-v $WORKSPACE:/workspace') {
+                        dir('/workspace') {
+                            sh 'npm test || echo "No tests found"'
+                        }
+                    }
+                }
             }
         }
 
