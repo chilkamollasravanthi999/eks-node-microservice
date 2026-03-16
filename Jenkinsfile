@@ -40,12 +40,11 @@ IMAGE_TAG = 'latest'
 }
 
 stages {
-
-```
 stage('Checkout') {
   steps {
     git branch: 'master', url: 'https://github.com/chilkamollasravanthi999/eks-node-microservice'
   }
+}
 }
 
 stage('NPM Build') {
