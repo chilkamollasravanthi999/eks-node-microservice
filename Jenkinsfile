@@ -16,31 +16,35 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                // Run this stage inside the Node.js agent container
+                container('nodejs') {
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test || echo "No tests found"'
+                container('nodejs') {
+                    sh 'npm test || echo "No tests found"'
+                }
             }
         }
 
         stage('Build & Push Docker Image with Kaniko') {
-    steps {
-        container('kaniko') {  // runs inside Kaniko container
-            sh '''
-            /kaniko/executor \
-                --dockerfile=$WORKSPACE/Dockerfile
-                --context=$WORKSPACE/
-                --destination=$ECR_REPO:$IMAGE_TAG \
-                --oci-layout-path=/workspace/output \
-                --verbosity=info
-            '''
+            steps {
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor \
+                        --dockerfile=$WORKSPACE/Dockerfile \
+                        --context=$WORKSPACE/ \
+                        --destination=$ECR_REPO:$IMAGE_TAG \
+                        --oci-layout-path=/workspace/output \
+                        --verbosity=info
+                    '''
+                }
+            }
         }
-    }
-}
-            
 
         stage('Deploy to EKS') {
             steps {
