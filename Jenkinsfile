@@ -1,32 +1,5 @@
 pipeline {
-    agent {
-        kubernetes {
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: jenkins-nodejs-kaniko
-spec:
-  containers:
-  - name: node
-    image: node:20-alpine
-    command:
-    - cat
-    tty: true
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
-    command:
-    - cat
-    tty: true
-  - name: kubectl
-    image: bitnami/kubectl:latest
-    command:
-    - cat
-    tty: true
-"""
-        }
-    }
+    agent any
 
     environment {
         AWS_REGION = 'ap-south-1'
@@ -43,30 +16,23 @@ spec:
 
         stage('NPM build') {
             steps {
-                container('node') {
-                    dir('/workspace') {
-                        echo 'NPM build is in progress'
-                        sh 'npm install'
-                        sh 'npm run build || echo "No build script found"'
-                    }
-                }
+                echo 'NPM build is in progress'
+                // Run npm commands directly if Node.js is installed on the Jenkins node
+                sh 'npm install'
+                sh 'npm run build || echo "No build script found"'
             }
         }
 
         stage('Run Tests') {
             steps {
-                container('node') {
-                    dir('/workspace') {
-                        sh 'npm test || echo "No tests found"'
-                    }
-                }
+                sh 'npm test || echo "No tests found"'
             }
         }
 
         stage('Build & Push Docker Image with Kaniko') {
             steps {
-                container('kaniko') {
-                    sh '''
+                // Assuming you have a Kaniko pod or container to run this
+                sh '''
 /kaniko/executor \
     --dockerfile=$WORKSPACE/Dockerfile \
     --context=$WORKSPACE/ \
@@ -74,18 +40,15 @@ spec:
     --oci-layout-path=/workspace/output \
     --verbosity=info
 '''
-                }
             }
         }
 
         stage('Deploy to EKS') {
             steps {
-                container('kubectl') {
-                    sh '''
+                sh '''
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 '''
-                }
             }
         }
     }
