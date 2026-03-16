@@ -1,5 +1,32 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: jenkins-nodejs-kaniko
+spec:
+  containers:
+  - name: node
+    image: node:20-alpine
+    command:
+    - cat
+    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    command:
+    - cat
+    tty: true
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command:
+    - cat
+    tty: true
+"""
+        }
+    }
 
     environment {
         AWS_REGION = 'ap-south-1'
@@ -14,16 +41,13 @@ pipeline {
             }
         }
 
-        // ✅ NPM build inside Node.js container
         stage('NPM build') {
             steps {
-                script {
-                    docker.image('node:20-alpine').inside('-v $WORKSPACE:/workspace') {
-                        dir('/workspace') {
-                            echo 'NPM build is in progress'
-                            sh 'npm install'
-                            sh 'npm run build || echo "No build script found"'
-                        }
+                container('node') {
+                    dir('/workspace') {
+                        echo 'NPM build is in progress'
+                        sh 'npm install'
+                        sh 'npm run build || echo "No build script found"'
                     }
                 }
             }
@@ -31,11 +55,9 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                script {
-                    docker.image('node:20-alpine').inside('-v $WORKSPACE:/workspace') {
-                        dir('/workspace') {
-                            sh 'npm test || echo "No tests found"'
-                        }
+                container('node') {
+                    dir('/workspace') {
+                        sh 'npm test || echo "No tests found"'
                     }
                 }
             }
@@ -58,10 +80,12 @@ pipeline {
 
         stage('Deploy to EKS') {
             steps {
-                sh '''
+                container('kubectl') {
+                    sh '''
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 '''
+                }
             }
         }
     }
