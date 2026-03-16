@@ -15,13 +15,12 @@ pipeline {
         }
 
         stage('NPM build') {
-          steps {
-              echo 'Npm build is in progress'
-              sh '''
-                npm install
-              '''
+            steps {
+                echo 'Npm build is in progress'
+                sh '''
+npm install
+'''
             }
-          }
         }
 
         stage('Run Tests') {
@@ -31,27 +30,26 @@ pipeline {
         }
 
         stage('Build & Push Docker Image with Kaniko') {
-    steps {
-        container('kaniko') {  // runs inside Kaniko container
-            sh '''
-            /kaniko/executor \
-                --dockerfile=$WORKSPACE/Dockerfile
-                --context=$WORKSPACE/
-                --destination=$ECR_REPO:$IMAGE_TAG \
-                --oci-layout-path=/workspace/output \
-                --verbosity=info
-            '''
+            steps {
+                container('kaniko') {
+                    sh '''
+/kaniko/executor \
+    --dockerfile=$WORKSPACE/Dockerfile \
+    --context=$WORKSPACE/ \
+    --destination=$ECR_REPO:$IMAGE_TAG \
+    --oci-layout-path=/workspace/output \
+    --verbosity=info
+'''
+                }
+            }
         }
-    }
-}
-            
 
         stage('Deploy to EKS') {
             steps {
                 sh '''
-                kubectl apply -f k8s/deployment.yaml
-                kubectl apply -f k8s/service.yaml
-                '''
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+'''
             }
         }
     }
