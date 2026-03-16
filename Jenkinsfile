@@ -14,10 +14,14 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
+        stage('NPM build') {
+          steps {
+              echo 'Npm build is in progress'
+              sh '''
+                npm install
+              '''
             }
+          }
         }
 
         stage('Run Tests') {
