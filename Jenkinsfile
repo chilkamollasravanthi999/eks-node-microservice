@@ -14,19 +14,13 @@ pipeline {
             }
         }
 
+        // ✅ NPM build stage running on nodejs-agent
         stage('NPM build') {
-            agent {
-                docker { 
-                    image 'node:20-alpine' 
-                    args '-v $WORKSPACE:/workspace'  // Mount workspace
-                }
-            }
+            agent { label 'nodejs-agent' }
             steps {
-                dir('/workspace') {
-                    echo 'NPM build is in progress'
-                    sh 'npm install'
-                    sh 'npm run build || echo "No build script found"'
-                }
+                echo 'NPM build is in progress'
+                sh 'npm install'
+                sh 'npm run build || echo "No build script found"'
             }
         }
 
