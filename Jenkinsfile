@@ -69,27 +69,31 @@ stage('Build & Push Image (Kaniko)') {
   steps {
     container('kaniko') {
       sh '''
-      /kaniko/executor \
-        --dockerfile=$WORKSPACE/Dockerfile \
-        --context=$WORKSPACE \
-        --destination=$ECR_REPO:$IMAGE_TAG \
-        --verbosity=info
-      '''
-    }
-  }
+```
+
+/kaniko/executor 
+--dockerfile=$WORKSPACE/Dockerfile 
+--context=$WORKSPACE 
+--destination=$ECR_REPO:$IMAGE_TAG 
+--verbosity=info
+'''
+}
+}
 }
 
+```
 stage('Deploy to EKS') {
   steps {
     container('kubectl') {
       sh '''
-      kubectl apply -f k8s/deployment.yaml
-      kubectl apply -f k8s/service.yaml
-      '''
-    }
-  }
-}
 ```
+
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+'''
+}
+}
+}
 
 }
 
