@@ -15,7 +15,7 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
     command:
-      - /busybox/sleep
+      - sleep
     args:
       - "999999"
     tty: true
